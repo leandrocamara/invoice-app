@@ -39,6 +39,7 @@
 
 <script>
 import http from '@/resources/http'
+import notification from '@/resources/notification'
 
 export default {
   name: 'invoice-table',
@@ -49,18 +50,10 @@ export default {
     }
   },
   created () {
-    this.$notify({
-      message: 'Welcome to <b>Material Dashboard</b> - a beautiful freebie for every web developer.',
-      icon: 'add_alert',
-      horizontalAlign: 'right',
-      verticalAlign: 'bottom',
-      type: 'success'
-    })
     this.getInvoices()
   },
   data () {
     return {
-      selected: [],
       invoices: []
     }
   },
@@ -73,7 +66,10 @@ export default {
         .then(response => {
           this.invoices = response.data
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+          console.log(error)
+          notification(this, 'Falha ao buscar as Faturas!', 'danger')
+        })
     },
     /**
      * Remove uma fatura.
@@ -83,10 +79,13 @@ export default {
     deleteInvoice (invoice) {
       http.delete('/invoices/' + invoice._id)
         .then(response => {
-          console.log(response.data)
+          notification(this, 'Fatura removida com sucesso!')
           this.invoices.splice(this.invoices.indexOf(invoice, 1))
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+          console.log(error)
+          notification(this, 'Falha ao remover a Fatura!', 'danger')
+        })
     }
   }
 }

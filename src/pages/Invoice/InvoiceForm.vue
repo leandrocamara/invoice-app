@@ -66,6 +66,7 @@
 
 <script>
 import http from '@/resources/http'
+import notification from '@/resources/notification'
 
 export default {
   name: 'invoice-form',
@@ -97,7 +98,10 @@ export default {
         .then(response => {
           this.invoice = this.getPreparedInvoice(response.data)
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+          console.log(error)
+          notification(this, 'Falha ao busca a Fatura!', 'danger')
+        })
     },
     /**
      * Salva uma nova fatura.
@@ -108,8 +112,12 @@ export default {
       http.post('/invoices', invoice)
         .then(response => {
           this.$router.push({ path: 'faturas' })
+          notification(this, 'Fatura cadastrada com sucesso!')
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+          console.log(error)
+          notification(this, 'Falha ao cadastrar a Fatura!', 'danger')
+        })
     },
     /**
      * Altera a fatura de acordo com ID.
@@ -119,10 +127,13 @@ export default {
 
       http.put(`/invoices/${invoice._id}`, invoice)
         .then(response => {
-          console.log(response)
           this.$router.push({ path: 'faturas' })
+          notification(this, 'Fatura alterada com sucesso!')
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+          console.log(error)
+          notification(this, 'Falha ao alterar os dados da Fatura!', 'danger')
+        })
     },
     /**
      * Prepara os dados da fatura para envio ao Servidor.
@@ -140,7 +151,6 @@ export default {
 
   }
 }
-
 </script>
 
 <style>
