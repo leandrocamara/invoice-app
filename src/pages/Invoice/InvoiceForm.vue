@@ -32,14 +32,18 @@
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-50">
                   <md-field>
-                    <label>Data de Vencimento</label>
-                    <md-input v-model="invoice.dateMaturity" v-mask="'##/##/####'" maxlength="10"></md-input>
-                  </md-field>
-                </div>
-                <div class="md-layout-item md-small-size-100 md-size-50">
-                  <md-field>
                     <label>Valor</label>
                     <md-input v-model="invoice.value" type="number"></md-input>
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-small-size-100 md-size-25">
+                  <md-field md-inline>
+                    <label>Data de Vencimento</label>
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-small-size-100 md-size-25">
+                  <md-field id="date-maturity">
+                    <date-picker v-model="invoice.dateMaturity" lang="pt-br" format="DD/MM/YYYY"></date-picker>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
@@ -48,7 +52,7 @@
                   </md-switch>
                 </div>
                 <div class="md-layout-item md-size-50 text-left">
-                  <md-button class="md-raised" to="/faturas">Voltar</md-button>
+                  <md-button class="md-raised md-danger" to="/faturas">Voltar</md-button>
                 </div>
                 <div class="md-layout-item md-size-50 text-right">
                   <md-button v-if="!id" class="md-raised md-success" @click="createInvoice()">Cadastrar</md-button>
@@ -65,11 +69,14 @@
 </template>
 
 <script>
+import DatePicker from 'vue2-datepicker'
+
 import http from '@/resources/http'
 import notification from '@/resources/notification'
 
 export default {
   name: 'invoice-form',
+  components: { DatePicker },
   props: ['id'],
   created () {
     if (this.id) {
@@ -111,7 +118,7 @@ export default {
 
       http.post('/invoices', invoice)
         .then(response => {
-          this.$router.push({ path: 'faturas' })
+          this.$router.push('/faturas')
           notification(this, 'Fatura cadastrada com sucesso!')
         })
         .catch(error => {
@@ -127,7 +134,7 @@ export default {
 
       http.put(`/invoices/${invoice._id}`, invoice)
         .then(response => {
-          this.$router.push({ path: 'faturas' })
+          this.$router.push('/faturas')
           notification(this, 'Fatura alterada com sucesso!')
         })
         .catch(error => {
@@ -154,6 +161,12 @@ export default {
 </script>
 
 <style>
+#date-maturity:before {
+  background-color: transparent !important;
+}
+#date-maturity:after {
+  background-color: transparent !important;
+}
 /* border-bottom */
 .md-field.md-theme-default:before {
   background-color: #43a047 !important;
