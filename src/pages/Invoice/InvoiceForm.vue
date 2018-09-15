@@ -16,7 +16,6 @@
             </md-card-header>
 
             <md-card-content>
-
               <div class="md-layout">
                 <div class="md-layout-item md-small-size-100 md-size-50">
                   <md-field>
@@ -26,24 +25,22 @@
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-50">
                   <md-field>
-                    <label>Nome da Empresa</label>
-                    <md-input v-model="invoice.nameCompany"></md-input>
-                  </md-field>
-                </div>
-                <div class="md-layout-item md-small-size-100 md-size-50">
-                  <md-field>
                     <label>Valor</label>
-                    <md-input v-model="invoice.value" type="number"></md-input>
+                    <md-input v-model="invoice.value" type="number" data-vv-name="value" v-validate="'required'" required></md-input>
                   </md-field>
                 </div>
-                <div class="md-layout-item md-small-size-100 md-size-25">
-                  <md-field md-inline>
-                    <label>Data de Vencimento</label>
+                <div class="md-layout-item md-small-size-100 md-size-75">
+                  <md-field>
+                    <label>Nome da Empresa</label>
+                    <md-input v-model="invoice.nameCompany" data-vv-name="nameCompany" v-validate="'required'" required></md-input>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-25">
                   <md-field id="date-maturity">
-                    <date-picker v-model="invoice.dateMaturity" lang="pt-br" format="DD/MM/YYYY"></date-picker>
+                    <date-picker
+                      v-model="invoice.dateMaturity" placeholder="Data de Vencimento*" data-vv-name="dateMaturity"
+                      v-validate="'required'" format="DD/MM/YYYY" :editable="false" lang="pt-br" required>
+                    </date-picker>
                   </md-field>
                 </div>
                 <div class="md-layout-item md-small-size-100 md-size-100">
@@ -59,7 +56,6 @@
                   <md-button v-else class="md-raised md-success" @click="updateInvoice()">Alterar</md-button>
                 </div>
               </div>
-
             </md-card-content>
           </md-card>
         </form>
@@ -90,7 +86,8 @@ export default {
         name: 'Leandro Câmara'
       },
       invoice: {
-        paid: false
+        paid: false,
+        dateMaturity: null
       }
     }
   },
@@ -103,7 +100,7 @@ export default {
     getInvoice (idInvoice) {
       http.get('/invoices/' + idInvoice)
         .then(response => {
-          this.invoice = this.getPreparedInvoice(response.data)
+          this.invoice = response.data
         })
         .catch(error => {
           console.log(error)
@@ -114,25 +111,29 @@ export default {
      * Salva uma nova fatura.
      */
     createInvoice () {
-      const invoice = this.getPreparedInvoice(this.invoice)
+      this.$validator.validateAll().then(valid => {
+        if (valid) {
+          this.getPreparedInvoice()
 
-      http.post('/invoices', invoice)
-        .then(response => {
-          this.$router.push('/faturas')
-          notification(this, 'Fatura cadastrada com sucesso!')
-        })
-        .catch(error => {
-          console.log(error)
-          notification(this, 'Falha ao cadastrar a Fatura!', 'danger')
-        })
+          http.post('/invoices', this.invoice)
+          .then(response => {
+            this.$router.push('/faturas')
+            notification(this, 'Fatura cadastrada com sucesso!')
+          })
+          .catch(error => {
+            console.log(error)
+            notification(this, 'Falha ao cadastrar a Fatura!', 'danger')
+          })
+        } else {
+          notification(this, 'Favor preencher os campos obrigatórios!', 'danger')
+        }
+      })
     },
     /**
      * Altera a fatura de acordo com ID.
      */
     updateInvoice () {
-      const invoice = this.getPreparedInvoice(this.invoice)
-
-      http.put(`/invoices/${invoice._id}`, invoice)
+      http.put(`/invoices/${this.invoice._id}`, this.invoice)
         .then(response => {
           this.$router.push('/faturas')
           notification(this, 'Fatura alterada com sucesso!')
@@ -144,16 +145,9 @@ export default {
     },
     /**
      * Prepara os dados da fatura para envio ao Servidor.
-     *
-     * @param invoice
      */
-    getPreparedInvoice (invoice) {
-      const preparedInvoice = Object.assign({}, invoice)
-
-      preparedInvoice.user = this.userMock
-      // preparedInvoice.dateMaturity = (new Date(invoice.dateMaturity)).toLocaleDateString('en-GB')
-
-      return preparedInvoice
+    getPreparedInvoice () {
+      this.invoice.user = this.userMock
     }
 
   }
@@ -161,12 +155,22 @@ export default {
 </script>
 
 <style>
+/* date-maturity */
 #date-maturity:before {
   background-color: transparent !important;
 }
 #date-maturity:after {
   background-color: transparent !important;
 }
+
+/* md-invalid */
+.md-field.md-theme-default.md-invalid label {
+  color: #ff1744 !important;
+}
+.md-field.md-theme-default.md-invalid:after {
+  background-color: #ff1744 !important;
+}
+
 /* border-bottom */
 .md-field.md-theme-default:before {
   background-color: #43a047 !important;

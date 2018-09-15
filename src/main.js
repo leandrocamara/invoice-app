@@ -9,6 +9,8 @@ import routes from './routes/routes'
 
 // Plugins
 import VueMask from 'v-mask'
+import VeeValidate from 'vee-validate'
+import Dictionary from './resources/dictionary'
 import GlobalComponents from './config/globalComponents'
 import GlobalDirectives from './config/globalDirectives'
 import Notifications from './components/NotificationPlugin'
@@ -28,14 +30,15 @@ const router = new VueRouter({
   linkExactActiveClass: 'nav-item active'
 })
 
+Vue.use(VueMask)
 Vue.use(VueRouter)
-Vue.use(MaterialDashboard)
+Vue.use(VueMoment)
+Vue.use(Notifications)
 Vue.use(GlobalComponents)
 Vue.use(GlobalDirectives)
-Vue.use(Notifications)
-Vue.use(VueMoment)
+Vue.use(MaterialDashboard)
 Vue.use(VueCurrencyFilter)
-Vue.use(VueMask)
+Vue.use(VeeValidate, { locale: 'pt', dictionary: Dictionary })
 
 // global library setup
 Object.defineProperty(Vue.prototype, '$Chartist', {
