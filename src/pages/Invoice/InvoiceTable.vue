@@ -67,8 +67,7 @@ export default {
           this.invoices = response.data
         })
         .catch(error => {
-          console.log(error)
-          notification(this, 'Falha ao buscar as Faturas!', 'danger')
+          notification(this, error.response.data.message, 'danger')
         })
     },
     /**
@@ -83,8 +82,7 @@ export default {
           this.invoices.splice(this.invoices.indexOf(invoice, 1))
         })
         .catch(error => {
-          console.log(error)
-          notification(this, 'Falha ao remover a Fatura!', 'danger')
+          notification(this, error.response.data.message, 'danger')
         })
     }
   }

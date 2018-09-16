@@ -103,8 +103,7 @@ export default {
           this.invoice = response.data
         })
         .catch(error => {
-          console.log(error)
-          notification(this, 'Falha ao busca a Fatura!', 'danger')
+          notification(this, error.response.data.message, 'danger')
         })
     },
     /**
@@ -116,14 +115,13 @@ export default {
           this.getPreparedInvoice()
 
           http.post('/invoices', this.invoice)
-          .then(response => {
-            this.$router.push('/faturas')
-            notification(this, 'Fatura cadastrada com sucesso!')
-          })
-          .catch(error => {
-            console.log(error)
-            notification(this, 'Falha ao cadastrar a Fatura!', 'danger')
-          })
+            .then(response => {
+              this.$router.push('/faturas')
+              notification(this, 'Fatura cadastrada com sucesso!')
+            })
+            .catch(error => {
+              notification(this, error.response.data.message, 'danger')
+            })
         } else {
           notification(this, 'Favor preencher os campos obrigatórios!', 'danger')
         }
@@ -139,8 +137,7 @@ export default {
           notification(this, 'Fatura alterada com sucesso!')
         })
         .catch(error => {
-          console.log(error)
-          notification(this, 'Falha ao alterar os dados da Fatura!', 'danger')
+          notification(this, error.response.data.message, 'danger')
         })
     },
     /**
